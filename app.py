@@ -238,7 +238,7 @@ def get_closest_vectors(labels, all_vectors, query_vector, n=5):
 
 def get_model_obj(model_object_path):
     print('Loading embeddings at path: {}'.format(model_object_path))
-    with open(model_object_path, 'rb') as handle:
+    with open(model_object_path, 'rb', encoding="latin1") as handle:
         model_obj = pickle.load(handle)
         # labels = model_obj['labels']
         # embeddings = model_obj['embeddings']
@@ -254,7 +254,7 @@ def get_model_obj(model_object_path):
 
 def get_embedding_objs(embedding_path):
     print('Loading embeddings at path: {}'.format(embedding_path))
-    with open(embedding_path, 'rb') as handle:
+    with open(embedding_path, 'rb', encoding="latin1") as handle:
         embedding_obj = pickle.load(handle)
         labels = embedding_obj['labels']
         embeddings = embedding_obj['embeddings']
