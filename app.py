@@ -342,5 +342,5 @@ doc2vec_embedding_model = Model(doc2vec_embedding_2d_path)
 if __name__ == '__main__':
     print('Server has started up at time: {}'.format(datetime.datetime.now().
                                                      strftime("%I:%M%p on %B %d, %Y")))
-app.run(debug=True, use_reloader=True) # not run for production. # host=0.0.0.0. port=80
+    app.run(debug=True, use_reloader=True) # not run for production. # host=0.0.0.0. port=80
 
