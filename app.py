@@ -4,13 +4,12 @@ import datetime
 import pickle
 import os
 import os.path
-
+from explorer import Model
 
 import numpy as np
 from flask import Flask, request, send_from_directory, jsonify
 
-#from explorer import Model
-#from scripts.download_from_s3_bucket import download_file_from_s3
+from scripts.download_from_s3_bucket import download_file_from_s3
 
 default_n = 15
 STATIC_DIR = os.path.dirname(os.path.realpath(__file__)) + '/public'
@@ -25,6 +24,10 @@ def index():
 @app.route("/paper-embedding-proximity-page")
 def paper_embedding_table():
     return render_template('paper_embedding_proximity.html')
+
+@app.route("/paper-embedding-viz")
+def paper_embedding_viz():
+    return render_template('paper_embedding_viz.html')
 
 @app.route("/word-embedding-proximity")
 def get_word_embedding_proximity():
@@ -275,8 +278,7 @@ def download_model(key, output_path):
     if os.path.exists(output_path):
         print('File at: {} already exists'.format(output_path))
     else:
-        pass
-        #download_file_from_s3(key, output_path)
+        download_file_from_s3(key, output_path)
 
 # All models and saved objects
 # ------------------
@@ -288,52 +290,51 @@ def download_model(key, output_path):
 
 # Download all models if they don't already exist (download_model() checks)
 # todo should be done in another script so 4 workers dont do it as well
-#gensim_embedding_name = 'type_word2vec#dim_100#dataset_ArxivNov4#time_2018-11-13T07_17_46.600182'
-#gensim_2d_embeddings_name = 'type_word2vec#dim_2#dataset_ArxivNov4#time_2018-11-13T07_17_46.600182'
-#lsa_embedding_name = 'lsa-100.pkl' # 'lsa-300.pkl' # seems too big
-#lsa_embedding_2d_name = 'lsa-2.pkl'
-#lsa_IR_model_object_name = 'lsa-tfidf-pipeline-50k-feats-400-dim.pkl'
-doc2vec_embedding_name = 'type_doc2vec#dim_100#dataset_ArxivNov4#time_2018-11-14T02:10:25.587584' # 'doc2vec-300.pkl' # not right format
-#doc2vec_embedding_2d_name = 'type_doc2vec#dim_2#dataset_ArxivNov4#time_2018-11-14T02_10_25.587584'
+gensim_embedding_name = 'type_word2vec#dim_100#dataset_ArxivNov4#time_2018-11-13T07_17_46.600182'
+gensim_2d_embeddings_name = 'type_word2vec#dim_2#dataset_ArxivNov4#time_2018-11-13T07_17_46.600182'
+lsa_embedding_name = 'lsa-100.pkl' # 'lsa-300.pkl' # seems too big
+lsa_embedding_2d_name = 'lsa-2.pkl'
+lsa_IR_model_object_name = 'lsa-tfidf-pipeline-50k-feats-400-dim.pkl'
+doc2vec_embedding_name = 'type_doc2vec#dim_100#dataset_ArxivNov4#time_2018-11-14T02_10_25.587584' # 'doc2vec-300.pkl' # not right format
+doc2vec_embedding_2d_name = 'type_doc2vec#dim_2#dataset_ArxivNov4#time_2018-11-14T02_10_25.587584'
 
-#gensim_embedding_path = 'data/word_embeddings/' + gensim_embedding_name
-#gensim_2d_embeddings_path = 'data/word_embeddings/' + gensim_2d_embeddings_name
-#lsa_embedding_path = 'data/paper_embeddings/' + lsa_embedding_name
-#lsa_embedding_2d_path = 'data/paper_embeddings/' + lsa_embedding_2d_name
-#lsa_IR_model_object_path = 'data/models/' + lsa_IR_model_object_name
-resource_path = os.path.join(app.root_path)
-doc2vec_embedding_path = resource_path + '/data/paper_embeddings/' + doc2vec_embedding_name
-#doc2vec_embedding_2d_path = 'data/paper_embeddings/' + doc2vec_embedding_2d_name
+gensim_embedding_path = 'data/word_embeddings/' + gensim_embedding_name
+gensim_2d_embeddings_path = 'data/word_embeddings/' + gensim_2d_embeddings_name
+lsa_embedding_path = 'data/paper_embeddings/' + lsa_embedding_name
+lsa_embedding_2d_path = 'data/paper_embeddings/' + lsa_embedding_2d_name
+lsa_IR_model_object_path = 'data/models/' + lsa_IR_model_object_name
+doc2vec_embedding_path = 'data/paper_embeddings/' + doc2vec_embedding_name
+doc2vec_embedding_2d_path = 'data/paper_embeddings/' + doc2vec_embedding_2d_name
 
 print('Beginning to download all models')
-#download_model('model_objects/' + gensim_embedding_name, gensim_embedding_path)
-#download_model('model_objects/' + gensim_2d_embeddings_name, gensim_2d_embeddings_path)
-#download_model('model_objects/' + lsa_embedding_name, lsa_embedding_path)
-#download_model('model_objects/' + lsa_embedding_2d_name, lsa_embedding_2d_path)
+download_model('model_objects/' + gensim_embedding_name, gensim_embedding_path)
+download_model('model_objects/' + gensim_2d_embeddings_name, gensim_2d_embeddings_path)
+download_model('model_objects/' + lsa_embedding_name, lsa_embedding_path)
+download_model('model_objects/' + lsa_embedding_2d_name, lsa_embedding_2d_path)
 #download_model('model_objects/' + lsa_IR_model_object_name, lsa_IR_model_object_path)
 download_model('model_objects/' + doc2vec_embedding_name, doc2vec_embedding_path)
-#download_model('model_objects/' + doc2vec_embedding_2d_name, doc2vec_embedding_2d_path)
+download_model('model_objects/' + doc2vec_embedding_2d_name, doc2vec_embedding_2d_path)
 
 # Loading models into embedding objects and Explorer objects
 # Load all word embeddings
-#gensim_labels, gensim_embeddings, gensim_label_to_embeddings = get_embedding_objs(gensim_embedding_path)
+gensim_labels, gensim_embeddings, gensim_label_to_embeddings = get_embedding_objs(gensim_embedding_path)
 
 # Load gensim 2d embedding model into word2vec-explorer visualisation
-#gensim_embedding_model = Model(gensim_2d_embeddings_path)
+gensim_embedding_model = Model(gensim_2d_embeddings_path)
 
 # fast_text_embedding_path = 'data/word_embeddings/fast_text_vectors.pkl'
 # print('Loading fast_text vectors at path: {}'.format(fast_text_embedding_path))
 # fast_text_labels, fast_text_embeddings, fast_text_label_to_embeddings = get_embedding_objs(fast_text_embedding_path)
 
 # Load paper embeddings
-#lsa_labels, lsa_embeddings, lsa_label_to_embeddings = get_embedding_objs(lsa_embedding_path)
+lsa_labels, lsa_embeddings, lsa_label_to_embeddings = get_embedding_objs(lsa_embedding_path)
 doc2vec_labels, doc2vec_embeddings, doc2vec_label_to_embeddings = get_embedding_objs(doc2vec_embedding_path)
 
 # Load lsa model (2d TSNE-precomputed) into word2vec-explorer visualisation
-#lsa_embedding_model = Model(lsa_embedding_2d_path)
+lsa_embedding_model = Model(lsa_embedding_2d_path)
 
 # Load doc2vec model (2d TSNE-precomputed) into word2vec-explorer visualisation
-#doc2vec_embedding_model = Model(doc2vec_embedding_2d_path)
+doc2vec_embedding_model = Model(doc2vec_embedding_2d_path)
 
 # Load IR model objects for Information Retrieval
 # lsa_IR_model = get_model_obj(lsa_IR_model_object_path)
@@ -341,6 +342,5 @@ doc2vec_labels, doc2vec_embeddings, doc2vec_label_to_embeddings = get_embedding_
 if __name__ == '__main__':
     print('Server has started up at time: {}'.format(datetime.datetime.now().
                                                      strftime("%I:%M%p on %B %d, %Y")))
-    app.run(debug=True, use_reloader=True)  # not run for production. # host=0.0.0.0. port=80
-
+app.run(debug=True, use_reloader=True) # not run for production. # host=0.0.0.0. port=80
 
